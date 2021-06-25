@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Button } from 'react-bootstrap';
 import Theme from '../components/Theme';
-
+import App from '../components/App';
+import CommonStudent from '../components/CommonStudent';
 // Straight away require/import scss/css just like in react.
 import indexStyle from '../styles/index.scss';
 
@@ -16,36 +17,19 @@ const Index = () => (
             */
         }
         <style dangerouslySetInnerHTML={{ __html: indexStyle }} />
-
-        <span className="heading">React.js | Next.js | Express.js | Bootstrap - SCSS</span>
-        <span className="text">with SSR.</span>
-
-        {/* Acquire static assets from express static directly. */}
-        <div className="img-container">
-            <img alt="" src="/icons/github.png" />
-        </div>
-
-        <span className="text">
-            <a href="https://github.com/MustansirZia/next-express-bootstrap-boilerplate">
-              Github
-            </a>
-        </span>
-        <br />
-        <div className="btn">
-            <Link href="/profile">
-                <Button bsStyle="primary">Click Me</Button>
-            </Link>
-        </div>
+        <App>
+          <CommonStudent />
+        </App>
 
         {/* Styling using styled-jsx. */}
-        <style jsx>
+        {/* <style jsx>
             {`
               .btn {
                 display: flex;
                 justify-content: center;
               }`
             }
-        </style>
+        </style> */}
     </Theme>
 );
 

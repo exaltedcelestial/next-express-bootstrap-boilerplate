@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const next = require('./next');
 
+console.log('URL:', process.env.BACKEND_URL)
 const app = express();
 // Put in place textbook middlewares for express.
 if (process.env.NODE_ENV !== 'production') {
