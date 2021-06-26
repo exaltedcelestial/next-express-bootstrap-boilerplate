@@ -5,7 +5,7 @@ import axios from '../helpers/axios';
 export const AppContext = React.createContext({});
 
 const { publicRuntimeConfig } = getConfig();
-const defaultURL = 'http://localhost:3004/';
+const defaultURL = 'http://localhost:4000/';
 console.log('url used:', publicRuntimeConfig.url || defaultURL)
 const instance = axios(publicRuntimeConfig.url || defaultURL);
 const App = ({ children }) => (
