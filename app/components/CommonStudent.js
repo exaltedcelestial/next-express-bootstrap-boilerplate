@@ -3,11 +3,16 @@ import { AppContext } from './App';
 import { Form, Button } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import Joi from 'joi';
+import Table from 'react-bootstrap/Table'
 import attachInterceptor from '../helpers/common-student/handleRequest';
 import '../styles/CommonStudent.scss';
 
 const CommonStudent = () => {
   const context = useContext(AppContext);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [lastTutor, setLastTutor] = useState('');
+
   const { fetchAPI } = context;
   const customInstance = attachInterceptor(fetchAPI);
   const schema = Joi.object({
@@ -16,29 +21,38 @@ const CommonStudent = () => {
       Joi.array().items(Joi.string().email({ tlds: { allow: false } })).min(2)
     ).required(),
   }).required();
-
   const formik = useFormik({
     initialValues: {
       tutor: '',
     },
-    onSubmit: (values, { setErrors }) => {
-      const { error } = schema.validate(values)
+    onSubmit: async (values, { setErrors }) => {
+      try {
+        setLoading(true)
+        const { error } = schema.validate(values)
+        if (error) {
+          const { details = [] } = error;
+          const errors = details.reduce((mem, detail) => {
+            const { message, context: { key } } = detail;
+            return Object.assign(mem, { [key]: message });
+          }, {})
 
-      if (error) {
-        const { details = [] } = error;
-        const errors = details.reduce((mem, detail) => {
-          const { message, context: { key } } = detail;
-          return Object.assign(mem, { [key]: message });
-        }, {})
+          setErrors(errors)
+          return;
+        }
 
-        setErrors(errors)
-        return;
+        setLastTutor(values.tutor);
+        const response = await customInstance.get('/api/getcommonsstudents', { params: { tutor: values.tutor } });
+        const { data = {} } = response;
+        const { students: recipients = [] } = data;
+        setStudents(recipients);
+        setLoading(false);
+      } catch (error) {
+        console.log(error)        
       }
-
-      customInstance.get('/api/getcommonsstudents', { params: { tutor: values.tutor } })
-        .catch(e => alert(JSON.stringify(e)));
     },
   });
+  const sameTutor = formik.values.tutor === lastTutor;
+  const blankTutor = !formik.values.tutor.trim();
 
   return (
     <>
@@ -68,11 +82,21 @@ const CommonStudent = () => {
               </Form.Text>
             </Form.Group>
 
-            <Button className="submit-button" variant="primary" type="submit">
-              <i className='spinner-border text-light spinner-border-sm' />
-              Fetching results
+            <Button className="submit-button" variant="primary" type="submit" disabled={loading || sameTutor || blankTutor}>
+              {(()=> {
+                if (sameTutor  && !blankTutor) return 'Already Searched'
+                if (!loading) return 'Search Students'
+                return (
+                  <>
+                    <i className='spinner-border text-light spinner-border-sm' /> Fetching results
+                  </>
+                );
+              })()}
             </Button>
           </Form>
+        </div>
+        <div className="common-students-search">
+          {JSON.stringify(students)}
         </div>
       </div>
     </>
