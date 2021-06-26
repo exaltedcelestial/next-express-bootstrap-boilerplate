@@ -10,6 +10,32 @@
 
 </p>
 
+========================================================================================
+
+# Setup
+----------------------------------------------------------------------------------------
+## Install Dependencies
+```javascript
+    npm i
+```
+
+## Changing backend URL
+It can be changed in package.json
+```json
+  "scripts": {
+    "build": "cd app && next build",
+    "start": "npm run build && env NODE_ENV=production node app.js",
+    "dev": "cross-env NODE_ENV=development BACKEND_URL=http://localhost:4000 nodemon --ignore app/ app.js"
+  },
+```
+
+## Run App
+```javascript
+    npm run dev
+```
+
+========================================================================================
+
 ## Contents
 
 - [TL;DR.](#TL;DR)
