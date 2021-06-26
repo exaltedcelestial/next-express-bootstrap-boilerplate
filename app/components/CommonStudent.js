@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useCallback, useState } from 'react';
 import { AppContext } from './App';
 import { Form, Button } from 'react-bootstrap';
 import { useFormik } from 'formik';
+import Spinner from 'react-bootstrap/Spinner'
 import Joi from 'joi';
 import Table from 'react-bootstrap/Table'
 import attachInterceptor from '../helpers/common-student/handleRequest';
@@ -39,15 +40,20 @@ const CommonStudent = () => {
           setErrors(errors)
           return;
         }
-
+        function delay(t) {
+          return new Promise((resolve) => {
+            setTimeout(resolve, t)
+          })
+        }
         setLastTutor(values.tutor);
         const response = await customInstance.get('/api/getcommonsstudents', { params: { tutor: values.tutor } });
         const { data = {} } = response;
         const { students: recipients = [] } = data;
         setStudents(recipients);
-        setLoading(false);
       } catch (error) {
         console.log(error)        
+      } finally {
+        setLoading(false);
       }
     },
   });
@@ -57,11 +63,9 @@ const CommonStudent = () => {
   return (
     <>
       <div className='common-students'>
-        <span className='common-students-header'>
-          <h2>
-            Student List
-          </h2>
-        </span>
+        <div className='common-students-header'>
+          Student List
+        </div>
         <div className="common-students-search">
           <Form onSubmit={formik.handleSubmit}>
             <Form.Group controlId="formBasicEmail">
@@ -85,18 +89,72 @@ const CommonStudent = () => {
             <Button className="submit-button" variant="primary" type="submit" disabled={loading || sameTutor || blankTutor}>
               {(()=> {
                 if (sameTutor  && !blankTutor) return 'Already Searched'
-                if (!loading) return 'Search Students'
-                return (
-                  <>
-                    <i className='spinner-border text-light spinner-border-sm' /> Fetching results
-                  </>
-                );
+                return 'Search Students'
+                /*
+                  return (
+                    <>
+                      <i className='spinner-border text-light spinner-border-sm' /> Fetching results
+                    </>
+                  );
+                */
               })()}
             </Button>
           </Form>
         </div>
-        <div className="common-students-search">
-          {JSON.stringify(students)}
+        <div className="common-students-table">
+          {(() => {
+            if (loading) {
+              return (
+                <>
+                  <div className='spinner-wrapper'>
+                    <div className='spinner-border text-primary spinner-border'>
+                    </div>
+                  </div>
+                </>
+              );
+            }
+            if (students.length < 1) {
+              if (!lastTutor) return null
+              return (
+                <div className='no-students'>
+                  <h2>
+                    No students for this teacher.
+                  </h2>
+                </div>
+              );
+            }
+            return (
+              <>
+                <Table className="student-table" striped bordered hover variant="dark">
+                  <thead>
+                    <tr>
+                      <th>Teacher</th>
+                      <th>Student</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {students.map((student, i) => {
+                      let firstColumn = <></>;
+
+                      if (i === 0) {
+                        firstColumn = (
+                          <td rowSpan={students.length}>
+                            {lastTutor}
+                          </td>
+                        );
+                      }
+                      return (
+                        <tr>
+                          {firstColumn}
+                          <td>{student}</td>
+                        </tr>
+                      )
+                    })};
+                  </tbody>
+                </Table>
+              </>
+            );
+          })()}
         </div>
       </div>
     </>

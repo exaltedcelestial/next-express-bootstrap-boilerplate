@@ -2,10 +2,10 @@
   padding-top: 10px;
 
   &-header {
-    h2 {
-      text-align: center;
-      font-weight: 700;
-    }
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    width: 100vw;
   }
 
   &-search {
@@ -19,6 +19,28 @@
         margin-left: -12px;
         margin-right: 8px;
       }
+    }
+  }
+
+  &-table {
+    padding: 30px;
+
+    .spinner-wrapper {
+      height: 50vh;
+      width: 100vw;
+      display: grid;
+      align-items: center;
+      justify-content: center;
+
+      .spinner-border {
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+
+    .no-students {
+      text-align: center;
+      font-size: 2rem;
     }
   }
 }
